@@ -57,8 +57,8 @@ export default class BaseIndicatorWidget extends Vue {
 @import "@/styles/mixins.scss";
 
 .indicator-widget {
-  display: flex;
-  width: 100%;
+  display: grid;
+  grid-template-columns: 120px calc(100% - 120px);
   align-items: center;
 
   &__title {
