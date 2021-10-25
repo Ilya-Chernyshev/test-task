@@ -7,6 +7,9 @@
 - `src/components/BaseIndicatorWidget.vue` - Компонент виджета с заголовок. Составной с `BaseIndicatorScaleBar`.
 - `src/components/IndicatorWidgets.vue` - Компонент с виджетам. Для примера выведено 4 штуки.
 
+### Пример работы виджетов
+
+Пример на [codepen](https://codepen.io/ilya-chernyshev/pen/XWaMjbv).
 
 ## Структура проекта
 ### Исходный код веб-приложения
