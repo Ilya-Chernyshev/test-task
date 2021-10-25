@@ -9,7 +9,7 @@
 
 ### Пример работы виджетов
 
-Пример на [codepen](https://codepen.io/ilya-chernyshev/pen/XWaMjbv).
+Пример на [git pages](https://github.com/Ilya-Chernyshev/test-task/settings/pages).
 
 ## Структура проекта
 ### Исходный код веб-приложения
