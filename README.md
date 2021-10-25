@@ -1,24 +1,31 @@
-# test-task
+# Тестовое задание (test-task)
 
-## Project setup
-```
-npm install
-```
+Данные для виджетов хранятся тут `src/constants/data.ts`
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+- `src/components/BaseIndicatorItem.vue` - Компонент индикатора (Полоса).
+- `src/components/BaseIndicatorScaleBar.vue` - Компонент шкалы с индикаторами (Набор индикаторов с ярлыком информации).
+- `src/components/BaseIndicatorWidget.vue` - Компонент виджета с заголовок. Составной с `BaseIndicatorScaleBar`.
+- `src/components/IndicatorWidgets.vue` - Компонент с виджетам. Для примера выведено 4 штуки.
 
-### Compiles and minifies for production
-```
-npm run build
-```
 
-### Lints and fixes files
-```
-npm run lint
-```
+### Структура проекта
+# Исходный код веб-приложения
+├── src
+   # Статическое содержимое
+|  ├── assets
+   # Компоненты
+|  ├── components
+   # Константы (Вынесенные данные) 
+|  ├── constants
+   # Утилиты (Вынесенные функции)
+|  ├── helpers
+   # CSS-стили
+|  ├── styles
+   # TS типы
+|  ├── typings
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### Команды
+
+- `npm run serve` - запустить приложение в режиме разработки;
+- `npm run build` - собрать статические файлы приложения для публикации на стенд;
+- `npm run lint` - запустить линтер для поиска ошибок в коде;
