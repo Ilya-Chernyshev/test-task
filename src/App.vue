@@ -1,29 +1,31 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+    <!-- Блок с виджетами -->
+    <IndicatorWidgets />
   </div>
 </template>
 
 <script lang="ts">
+/** Декораторы */
 import { Component, Vue } from 'vue-property-decorator';
-import HelloWorld from './components/HelloWorld.vue';
+
+/** Компоненты */
+import IndicatorWidgets from '@/components/IndicatorWidgets.vue';
 
 @Component({
   components: {
-    HelloWorld,
+    IndicatorWidgets,
   },
 })
 export default class App extends Vue {}
 </script>
 
-<style>
+<style lang="scss">
+@import 'normalize-scss';
+@import url('http://fonts.cdnfonts.com/css/lab-grotesque');
+@include normalize();
+
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  font-family: 'Lab Grotesque', sans-serif;
 }
 </style>
