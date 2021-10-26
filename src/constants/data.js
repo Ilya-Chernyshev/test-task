@@ -46,7 +46,7 @@ export default [
       {
         prevailingMessage: 'Risk of Loss',
         value: 16,
-        title: 'low',
+        title: 'Low',
         color: '#FF4C4C',
       },
     ],
@@ -57,7 +57,7 @@ export default [
       {
         prevailingMessage: 'Performance',
         value: 16,
-        title: 'low',
+        title: 'Low',
         color: '#45E596',
       },
       {
