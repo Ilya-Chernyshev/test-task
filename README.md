@@ -9,7 +9,7 @@
 
 ### Пример работы виджетов
 
-Пример на [git pages](https://github.com/Ilya-Chernyshev/test-task/settings/pages).
+Пример на [git pages](https://github.com/Ilya-Chernyshev/test-task).
 
 ## Структура проекта
 ### Исходный код веб-приложения

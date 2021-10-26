@@ -1,4 +1,4 @@
-<template>
+ <template>
   <div
     class="indicator-scale-bar"
     @mouseout="onIndicatorMouseout"
@@ -14,12 +14,12 @@
     >
       <!-- Заголовок ярлыка -->
       <div class="indicator-scale-bar__label-title" :style="labelTitleStyle">
-        {{ labelTitleText }}
+        {{ labelTitle }}
       </div>
 
       <!-- Описание ярлыка -->
       <div class="indicator-scale-bar__label-description">
-        {{ labelDescriptionText }}
+        {{ labelDescription }}
       </div>
     </div>
 
@@ -37,162 +37,199 @@
     </div>
   </div>
 </template>
-<script lang="ts">
-/** Декораторы */
-import {
-  Component, Vue, Prop, Ref, Watch,
-} from 'vue-property-decorator';
-
+<script>
 /** Компоненты */
-import BaseIndicatorItem from '@/components/BaseIndicatorItem.vue';
+import BaseIndicatorItem from "@/components/BaseIndicatorItem.vue";
 
-/** Типы */
-import { Indicator } from '@/types/Indicator';
-
-@Component({
+export default {
   components: {
     BaseIndicatorItem,
   },
-})
-export default class BaseIndicatorScaleBar extends Vue {
+
   /* --- PROPS --- */
 
-  /** Данные по индикаторам. */
-  @Prop({ type: Array, default: () => [], required: true })
-  public declare readonly dataIndicators: Indicator[];
+  props: {
+    /** Данные по индикаторам. */
+    dataIndicators: {
+      type: Array,
+      required: true,
+      default: () => [],
+    },
 
-  /** Признак отображения ярлыка. */
-  @Prop({ type: Boolean, default: true })
-  public declare readonly showLabel: boolean;
-
-  /* --- REFS --- */
-
-  /** Ссылка на ярлык. */
-  @Ref('label')
-  private declare readonly indicatorLabel: HTMLElement;
+    /** Признак отображения ярлыка. */
+    showLabel: {
+      type: Boolean,
+      default: true,
+    },
+  },
 
   /* --- DATA --- */
 
-  /** Активный индекс индикатора. */
-  private activeIndex: number | null = null;
+  data() {
+    return {
+      /** Активный индекс индикатора. */
+      activeIndex: null,
 
-  /** Позиция ярлыка по оси Х. Данная позиция не берет во внимание остальные размеры. */
-  private labelPositionX: number | null = null;
+      /** Позиция ярлыка по оси Х. Данная позиция не берет во внимание остальные размеры. */
+      labelPositionX: null,
 
-  /** css-стили ярлыка. */
-  private labelStyle: Record<string, string | number> = {};
+      /** css-стили ярлыка. */
+      labelStyle: {},
+    };
+  },
 
   /* --- COMPUTED --- */
 
-  /** CSS-класс для шкалы индикаторной шкалы. Активируется при наведении на индикатор. */
-  private get hoverClass(): Record<string, boolean> {
-    return { hover: this.activeIndex !== null };
-  }
+  computed: {
+    /**
+     * CSS-класс для шкалы индикаторной шкалы. Активируется при наведении на индикатор.
+     *
+     * @returns {Object<string, boolean>}
+     */
+    hoverClass() {
+      return { hover: this.activeIndex !== null };
+    },
 
-  /** Активный индикатор. */
-  private get activeIndicator(): Indicator | null {
-    if (this.activeIndex !== null) {
-      return this.dataIndicators[this.activeIndex];
-    }
-    return null;
-  }
+    /**
+     * Активный индикатор.
+     *
+     * @returns {{ width: string | number, color: string, value: string, description: string} | null} - Активный индикатор, если такой существует.
+     */
+    activeIndicator() {
+      if (this.activeIndex !== null) {
+        return this.dataIndicators[this.activeIndex];
+      }
+      return null;
+    },
 
-  /** Текст описания в ярлыке. */
-  private get labelDescriptionText() {
-    return this.activeIndicator?.description ?? '';
-  }
+    /**
+     * Текст описания ярлыка.
+     *
+     * @returns {string} - Описание ярлыка.
+     */
+    labelDescription() {
+      return this.activeIndicator?.description ?? "";
+    },
 
-  /** Текст в заголовке ярлыка. */
-  private get labelTitleText() {
-    return this.activeIndicator?.value
-      ? `${this.activeIndicator.value} — ${this.activeIndicator.width}`
-      : '';
-  }
+    /**
+     * Текст заголовка ярлыка.
+     *
+     * @returns {string} - Заголовок ярлыка.
+     */
+    labelTitle() {
+      return this.activeIndicator?.value
+        ? `${this.activeIndicator.value} — ${this.activeIndicator.width}`
+        : "";
+    },
 
-  /** Стили для заголовка ярлыка. */
-  private get labelTitleStyle() {
-    return { color: this.activeIndicator?.color ?? '' };
-  }
+    /**
+     * Стили для заголовка ярлыка.
+     *
+     * @returns {Object<string, string>}
+     */
+    labelTitleStyle() {
+      return { color: this.activeIndicator?.color ?? "" };
+    },
+  },
 
   /* --- WATCHERS --- */
 
-  /** Наблюдатель за изменением выбранного индекса индикатора. */
-  @Watch('activeIndex')
-  private onActiveIndexChanged() {
-    this.$emit('indicator-update', this.activeIndex);
-  }
+  watch: {
+    /** Наблюдатель за изменением выбранного индекса индикатора. */
+    activeIndex() {
+      this.$emit("indicator-update", this.activeIndex);
+    },
+  },
 
   /* --- METHODS --- */
 
-  /** Обработчик события mouseout. */
-  private onIndicatorMouseout(): void {
-    this.labelPositionX = null;
-    this.activeIndex = null;
+  methods: {
+    /** Обработчик события mouseout. */
+    onIndicatorMouseout() {
+      this.labelPositionX = null;
+      this.activeIndex = null;
 
-    this.setLabelStyle();
-  }
+      this.setStyleForLabel();
+    },
 
-  /** Обработчик события mouseover. */
-  private onIndicatorMouseover(event: Event): void {
-    const target = event.target as HTMLElement;
-    const index = this.getIndicatorIndexForElement(target);
+    /**
+     * Обработчик события mouseover.
+     *
+     * @param {Event} event - Дескриптор события.
+     */
+    onIndicatorMouseover(event) {
+      const target = event.target;
+      const index = this.getIndicatorIndexByElement(target);
 
-    if (index !== null && this.dataIndicators[index]) {
-      this.labelPositionX = target.offsetLeft;
-      this.activeIndex = index;
+      if (index !== null && this.dataIndicators[index]) {
+        this.labelPositionX = target.offsetLeft;
+        this.activeIndex = index;
 
-      // Ожидаем обновления DOM, после чего получаем стили для label.
-      this.$nextTick(() => {
-        this.setLabelStyle();
-      });
-    }
-  }
+        // Ожидаем обновления DOM, после чего получаем стили для label.
+        this.$nextTick(() => {
+          this.setStyleForLabel();
+        });
+      }
+    },
 
-  /** Установка стилей для ярлыка */
-  private setLabelStyle() {
-    this.labelStyle = this.getPositionLabel();
-    this.labelStyle.opacity = this.labelStyle?.transform ? 1 : 0;
-  }
+    /** Установка стилей для ярлыка */
+    setStyleForLabel() {
+      this.labelStyle = this.getPositionForLabel();
+      this.labelStyle.opacity = this.labelStyle?.transform ? 1 : 0;
+    },
 
-  /** Получения позиции ярлыка. Вызывается при наведении на индикаторы. */
-  private getPositionLabel(): Record<string, string | number> {
-    if (this.labelPositionX === null || !this.indicatorLabel.clientWidth) {
-      return {};
-    }
+    /**
+     * Получения позиции ярлыка. Вызывается при наведении на индикаторы.
+     *
+     * @returns {Object<string, string | number>} - Объект с css-классом
+     */
+    getPositionForLabel() {
+      if (this.labelPositionX === null || !this.$refs?.label.clientWidth) {
+        return {};
+      }
 
-    const scaleBarWidth = this.$el.clientWidth;
-    const labelWidth = this.indicatorLabel.clientWidth;
-    const labelWidthWithPosition = this.labelPositionX + labelWidth;
-    let labelPosition = this.labelPositionX;
+      const scaleBarWidth = this.$el.clientWidth;
+      const labelWidth = this.$refs?.label.clientWidth;
+      const labelWidthWithPosition = this.labelPositionX + labelWidth;
+      let labelPosition = this.labelPositionX;
 
-    if (labelWidthWithPosition > scaleBarWidth) {
-      const widthDifference = labelPosition - scaleBarWidth;
+      if (labelWidthWithPosition > scaleBarWidth) {
+        const widthDifference = labelPosition - scaleBarWidth;
 
-      labelPosition -= widthDifference;
-      labelPosition -= labelWidth;
-    }
+        labelPosition -= widthDifference;
+        labelPosition -= labelWidth;
+      }
 
-    return { transform: `translateX(${labelPosition}px)` };
-  }
+      return { transform: `translateX(${labelPosition}px)` };
+    },
 
-  /** Метод получения индекса индикатора по HTML-элементу. */
-  private getIndicatorIndexForElement(target: HTMLElement): number | null {
-    const index = Number(target.getAttribute('data-index'));
+    /**
+     * Метод получения индекса индикатора по HTML-элементу.
+     *
+     * @param {HTMLElement} target - Элемент DOM
+     * @returns {number | null} - Индекс элемента
+     */
+    getIndicatorIndexByElement(target) {
+      const index = Number(target.dataset.index);
 
-    if (Number.isNaN(index) || target === this.$el) {
-      return null;
-    }
+      if (Number.isNaN(index) || target === this.$el) {
+        return null;
+      }
 
-    return index;
-  }
+      return index;
+    },
 
-  /** Метод получения активного css-класса для индикатора. */
-  private getIndicatorActiveClassByIndex(
-    index: number,
-  ): Record<string, boolean> {
-    return { active: index === this.activeIndex };
-  }
-}
+    /**
+     * Метод получения активного css-класса для индикатора.
+     *
+     * @param {number} index - Индекс активного индикатора
+     * @returns {Object<string, string | number>} - Объект с css-классом
+     */
+    getIndicatorActiveClassByIndex(index) {
+      return { active: index === this.activeIndex };
+    },
+  },
+};
 </script>
 <style lang="scss" scoped>
 @import "@/styles/variables.scss";

@@ -11,45 +11,58 @@
   </div>
 </template>
 
-<script lang="ts">
-/** Декораторы */
-import { Component, Vue, Prop } from 'vue-property-decorator';
-
+<script>
 /** Компоненты */
-import BaseIndicatorScaleBar from '@/components/BaseIndicatorScaleBar.vue';
+import BaseIndicatorScaleBar from "@/components/BaseIndicatorScaleBar.vue";
 
-/** Типы */
-import { Indicator } from '@/types/Indicator';
-
-@Component({
+export default {
   components: {
     BaseIndicatorScaleBar,
   },
-})
-export default class BaseIndicatorWidget extends Vue {
+
   /* --- PROPS --- */
 
-  /** Данные для формирования виджета. */
-  @Prop({ type: Array, default: () => [], required: true })
-  public declare readonly data: Indicator[];
-
-  /** Заголовок виджета. */
-  @Prop({ type: String, default: '' })
-  public declare readonly title: string;
+  props: {
+    /** Данные для формирования виджета. */
+    data: {
+      type: Array,
+      required: true,
+      default: () => [],
+    },
+    
+    /** Заголовок виджета. */
+    title: {
+      type: String,
+      default: "",
+    },
+  },
 
   /* --- DATA --- */
 
-  /** css-класс при наведении на индикатор в виджетах.  */
-  private hover: Record<string, boolean> = {};
+  data() {
+    return {
+      /** css-класс при наведении на индикатор в виджетах.  */
+      hover: {},
+
+      /** Данны для виджетов. */
+      widgets: this.widgetsData,
+    };
+  },
 
   /* --- METHODS --- */
 
-  /** Обработчик события изменения активного индикатора в виджете. */
-  private onIndicatorUpdate(index: number | null) {
-    this.hover = { hover: index !== null };
-    this.$emit('indicator-update', index);
-  }
-}
+  methods: {
+    /**
+     * Обработчик события изменения активного индикатора в виджете.
+     *
+     * @param {number | null} index - Индекс активного индикатора
+     */
+    onIndicatorUpdate(index) {
+      this.hover = { hover: index !== null };
+      this.$emit("indicator-update", index);
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
