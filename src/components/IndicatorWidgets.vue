@@ -6,7 +6,7 @@
         <BaseIndicatorWidget
           @indicator-update="onIndicatorUpdate"
           :data="getDataIndicatorsInPercent(widget)"
-          :title="getPrevailingMessage(widget)"
+          :title="getPrevailingTitle(widget)"
           :key="`widget_${index}`"
         />
       </template>
@@ -14,62 +14,80 @@
   </div>
 </template>
 
-<script lang="ts">
-/** Декораторы */
-import { Component, Vue } from 'vue-property-decorator';
-
+<script>
 /** Компоненты */
-import BaseIndicatorWidget from '@/components/BaseIndicatorWidget.vue';
-
-/** Типы */
-import { IndicatorsWidgets } from '@/types/Indicator';
+import BaseIndicatorWidget from "@/components/BaseIndicatorWidget.vue";
 
 /** Утилиты */
-import getDataIndicatorsInPercent from '@/helpers/getDataIndicatorsInPercent';
+import getDataIndicatorsInPercent from "@/helpers/getDataIndicatorsInPercent";
 
 /** Данные */
-import widgetsData from '@/constants/data';
+import widgetsData from "@/constants/data";
 
-@Component({
+export default {
   components: {
     BaseIndicatorWidget,
   },
-})
-export default class App extends Vue {
+
   /* --- DATA --- */
 
-  /** css-класс при наведении на индикатор в виджетах.  */
-  private hover: Record<string, boolean> = {};
+  data() {
+    return {
+      /** css-класс при наведении на индикатор в виджетах.  */
+      hover: {},
 
-  /** Данны для виджетов. */
-  private widgets: IndicatorsWidgets[] = widgetsData;
+      /** Данные для виджетов. */
+      widgets: widgetsData,
+    };
+  },
 
   /* --- METHODS --- */
 
-  /**
-   * Метод для получения данных в процентах.
-   * Необходим для корректного отображения индикаторов в шкале с виджетами.
-   */
-  private getDataIndicatorsInPercent = getDataIndicatorsInPercent;
+  methods: {
+    /**
+     * Метод для получения данных в процентах.
+     * Необходим для корректного отображения индикаторов в шкале с виджетами.
+     * jsDoc типы данных описаны в самой функции.
+     */
+    getDataIndicatorsInPercent: getDataIndicatorsInPercent,
 
-  /** Обработчик события изменения активного индикатора в виджетах. */
-  private onIndicatorUpdate(index: number | null) {
-    this.hover = { hover: index !== null };
-  }
+    /**
+     * Обработчик события изменения активного индикатора в виджетах.
+     *
+     * @param {number | null} index - Индекс активного индикатора.
+     */
+    onIndicatorUpdate(index) {
+      this.hover = { hover: index !== null };
+    },
 
-  /** Метод получения заголовка для виджета. */
-  private getPrevailingMessage(dataWidgets: IndicatorsWidgets) {
-    let max = dataWidgets.indicatorsWidgets[0] || { value: 0 };
+    /**
+     * Метод получения заголовка для виджета.
+     * Отдает заголовок виджета на основании преобладающего кол-во данных.
+     * Если все данные одинаковые - вернет первый.
+     * Входной тип данных более подробно описан в getDataIndicatorsInPercent.js.
+     *
+     * @param {Object} dataWidgets - Данные виджета.
+     * @param {string} dataWidgets.indicatorTitle - Наименование индикатора (К примеру employees).
+     * @param {Array.<{prevailingMessage: string, value: number, title: string, color: string}>} dataWidgets.indicatorsWidgets - Информация о индикаторах.
+     * @returns {string} - Заголовок виджета.
+     */
+    getPrevailingTitle(dataWidgets) {
+      let max = dataWidgets.indicatorsWidgets[0] || {
+        value: 0,
+        prevailingMessage: "",
+      };
 
-    dataWidgets.indicatorsWidgets.forEach((item) => {
-      if (max.value < item.value) {
-        max = item;
-      }
-    });
+      // TODO - Можно оптимизировать обход выделением данных в объект.
+      dataWidgets.indicatorsWidgets.forEach((item) => {
+        if (max.value < item.value) {
+          max = item;
+        }
+      });
 
-    return max.prevailingMessage;
-  }
-}
+      return max.prevailingMessage;
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
